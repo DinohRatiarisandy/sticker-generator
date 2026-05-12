@@ -5,9 +5,11 @@ from rembg import remove
 from io import BytesIO
 import base64
 import os
+from rembg import new_session
 
 os.makedirs("temp", exist_ok=True)
 
+session = new_session()
 # ---------- GLOBAL STATE ----------
 
 cutout_image = None
@@ -118,7 +120,7 @@ async def on_upload(e):
     image = Image.open(BytesIO(file_bytes)).convert("RGBA")
 
     # Remove background once
-    cutout_image = remove(image)
+    cutout_image = remove(image, session=session)
 
     cutout_image = clean_alpha(cutout_image)
 
@@ -156,4 +158,4 @@ color_select.on(
 # Download button
 ui.button("Download PNG", on_click=download)
 
-ui.run()
+ui.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

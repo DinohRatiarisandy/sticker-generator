@@ -555,6 +555,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "nicegui" },
+    { name = "onnxruntime" },
     { name = "pillow" },
     { name = "rembg", extra = ["cpu"] },
 ]
@@ -562,6 +563,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "nicegui", specifier = ">=3.11.1" },
+    { name = "onnxruntime" },
     { name = "pillow", specifier = ">=12.2.0" },
     { name = "rembg", extras = ["cpu"], specifier = ">=2.0.75" },
 ]
