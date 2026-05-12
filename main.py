@@ -146,4 +146,4 @@ color_select.on(
 # Download button
 ui.button("Download PNG", on_click=download)
 
-ui.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+ui.run(title="StickerGenerator", host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
