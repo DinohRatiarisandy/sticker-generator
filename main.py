@@ -1,19 +1,17 @@
-from nicegui import ui
+from nicegui import run, ui
 from PIL import Image, ImageFilter
-from rembg import remove
-
+from dotenv import load_dotenv
 from io import BytesIO
 import base64
 import os
-from rembg import new_session
+import requests
 
+load_dotenv(".env", override=True)
 os.makedirs("temp", exist_ok=True)
+api_key = os.getenv("REMBG_API_KEY")
 
-session = new_session()
 # ---------- GLOBAL STATE ----------
-
 cutout_image = None
-
 
 # Pastel colors
 PASTEL_COLORS = {
@@ -27,6 +25,20 @@ PASTEL_COLORS = {
 # ---------- HELPERS ----------
 
 
+def remove_background_api(image_bytes):
+    response = requests.post(
+        "https://api.remove.bg/v1.0/removebg",
+        files={"image_file": ("image.png", image_bytes)},
+        data={"size": "preview"},
+        headers={"X-Api-Key": api_key},
+    )
+
+    if response.status_code != 200:
+        raise Exception(response.text)
+
+    return Image.open(BytesIO(response.content)).convert("RGBA")
+
+
 def pil_to_base64(img: Image.Image):
 
     buffer = BytesIO()
@@ -36,25 +48,6 @@ def pil_to_base64(img: Image.Image):
     encoded = base64.b64encode(buffer.getvalue()).decode()
 
     return f"data:image/png;base64,{encoded}"
-
-
-def clean_alpha(img: Image.Image, threshold=140):
-
-    img = img.convert("RGBA")
-
-    data = img.get_flattened_data()
-
-    new_data = []
-
-    for r, g, b, a in data:
-        if a < threshold:
-            new_data.append((255, 255, 255, 0))
-        else:
-            new_data.append((r, g, b, 255))
-
-    img.putdata(new_data)
-
-    return img
 
 
 def generate_preview(border_size, bg_color):
@@ -117,12 +110,7 @@ async def on_upload(e):
 
     file_bytes = await uploaded_file.read()
 
-    image = Image.open(BytesIO(file_bytes)).convert("RGBA")
-
-    # Remove background once
-    cutout_image = remove(image, session=session)
-
-    cutout_image = clean_alpha(cutout_image)
+    cutout_image = await run.io_bound(remove_background_api, file_bytes)
 
     generate_preview(border_slider.value, PASTEL_COLORS[color_select.value])
 

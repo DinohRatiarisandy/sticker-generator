@@ -16,3 +16,7 @@ wheels/
 *.PNG
 *.JPEG
 *.JPG
+
+
+# Variable d'environement
+*.env
