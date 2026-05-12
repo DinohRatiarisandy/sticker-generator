@@ -7,6 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "nicegui>=3.11.1",
     "pillow>=12.2.0",
-    "rembg[cpu]>=2.0.75",
-    "onnxruntime"
+    "python-dotenv>=1.2.2",
+    "requests>=2.34.0",
 ]
